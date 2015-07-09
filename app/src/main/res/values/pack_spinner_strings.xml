@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="cityArray">
+        <item>Baltimore</item>
+        <item>Boston</item>
+        <item>Anaheim</item>
+        <item>Chicago W</item>
+        <item>Cleveland</item>
+        <item>Detroit</item>
+        <item>Kansas City</item>
+        <item>Milwaukee</item>
+        <item>Minnesota</item>
+        <item>New York Y</item>
+        <item>Oakland</item>
+        <item>Seattle</item>
+        <item>Texas</item>
+        <item>Toronto</item>
+        <item>Atlanta</item>
+        <item>Chicago C</item>
+        <item>Cinicnnati</item>
+        <item>Houston</item>
+        <item>Los Angeles</item>
+        <item>Montrael</item>
+        <item>New York M</item>
+        <item>Philadelphia</item>
+        <item>Pittsburgh</item>
+        <item>St. Louis</item>
+        <item>San Diego</item>
+        <item>San Francisco</item>
+        <item>Colorado</item>
+        <item>Florida</item>
+        <item>Arizona</item>
+        <item>Tampa Bay</item>
+        <item>Washington</item>
+        <item>Los Angeles A</item>
+    </string-array>
+
+    <string-array name="shortNameList">
+        <item>BAL</item>
+        <item>BOS</item>
+        <item>ANA</item>
+        <item>CHW</item>
+        <item>CLE</item>
+        <item>DET</item>
+        <item>KC</item>
+        <item>MIL</item>
+        <item>MIN</item>
+        <item>NYY</item>
+        <item>OAK</item>
+        <item>SEA</item>
+        <item>TEX</item>
+        <item>TOR</item>
+        <item>ATL</item>
+        <item>CHC</item>
+        <item>CIN</item>
+        <item>HOU</item>
+        <item>LA</item>
+        <item>MON</item>
+        <item>NYM</item>
+        <item>PHI</item>
+        <item>PIT</item>
+        <item>STL</item>
+        <item>SD</item>
+        <item>SF</item>
+        <item>COL</item>
+        <item>FLA</item>
+        <item>ARI</item>
+        <item>TB</item>
+        <item>WAS</item>
+        <item>LAA</item>
+    </string-array>
+</resources>
