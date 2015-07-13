@@ -11,80 +11,39 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/search_instructions_string"/>
+        android:textSize="20sp"
+        android:text="Login"
+        android:layout_gravity="center_horizontal"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <EditText
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/linearLayout">
+        android:hint="Email"
+        android:id="@+id/emailText"
+        android:inputType="textEmailAddress"
+        android:layout_gravity="center_horizontal"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/city_choice_instructions"
-            android:textSize="20sp" />
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:id="@+id/passWordText"
+        android:layout_gravity="center_horizontal"
+        android:inputType="textPassword"/>
 
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/city_spinner"
-            android:spinnerMode="dropdown" />
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/year_edit"
-            android:hint="@string/year_edit_text"/>
-
-    </LinearLayout>
-
-    <LinearLayout
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center">
+        android:text="Login"
+        android:onClick="startLogin"
+        android:layout_gravity="center_horizontal"/>
 
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="@string/card_sort_button_text"
-            android:onClick="startSortCards"/>
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/filter_button_text"
-            android:onClick="applyFilter"
-            android:layout_weight="1"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/clearButton"
-            android:text="@string/clear_button_text"
-            android:onClick="clearData"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/signup_button_text"
-            android:onClick="startSignupActivity"/>
-
-    </LinearLayout>
-
-
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/instructionTextView"/>
-
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/listView">
-
-    </ListView>
+        android:text="New user? Click here."
+        android:layout_gravity="center_horizontal"
+        android:onClick="startSignup"/>
 
 
 </LinearLayout>

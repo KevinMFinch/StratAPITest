@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,8 +21,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.okhttp.HttpUrl;
+import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
 import org.json.JSONArray;
@@ -42,103 +45,29 @@ import java.util.Map;
 
 public class MainActivity extends ActionBarActivity {
 
-    JSONObject jsonObject;
-    JSONArray jsonArray;
-    ArrayList<JSONObject> jsonObjectArrayList = new ArrayList<>();
-    String chosenCityShort;
-    ArrayList<String> displayedPackIDList = new ArrayList<>();
-    ArrayAdapter theAdapter;
-    ArrayList<String> listStrings;
-    ListView theListView;
-    int currentPage = 0;
-    int totalPages;
-    ProgressDialog progDialog;
-    int code;
+    String email;
+    String password;
     String errorMessage;
-    ArrayList<String> short_name_list;
-    HashMap<String, String> cityMap;
-    String[] cityNames;
-    String[] cityShorts;
-    HttpUrl httpUrl;
-    String year;
+    String userID;
+    String userApiKey;
+    HttpUrl url;
+    JSONArray jsonArray;
+    JSONObject jsonObject;
+    int code;
+    RequestBody body ;
+    ArrayList<JSONObject> jsonObjectArrayList;
+
     static final String EXTRA_MESSAGE = "nyc.monorail.stratapitest.MESSAGE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listStrings = new ArrayList<>();
-        short_name_list = new ArrayList<>();
-        httpUrl = HttpUrl.parse("http://chrismobile.strat-o-matic.com/api/v1/packs");
-        cityMap = new HashMap<>();
+        jsonObjectArrayList = new ArrayList<>();
 
-        cityNames = getResources().getStringArray(R.array.cityArray);
-        cityShorts = getResources().getStringArray(R.array.shortNameList);
-
-        if (cityNames.length == cityShorts.length) {
-            for (int x = 0; x < cityNames.length; x++) {
-                cityMap.put(cityNames[x], cityShorts[x]);
-            }
-        }
-
-        initializeSpinner();
-        addListenerToParameterSpinner();
-        theListView = (ListView) findViewById(R.id.listView);
-        theListView.setOnScrollListener(new EndlessScrollListener());
     }
 
-    public class EndlessScrollListener implements AbsListView.OnScrollListener {
-
-        private int visibleThreshold = 3;
-        private int previousTotal = 0;
-        private boolean loading = true;
-
-        public EndlessScrollListener() {
-        }
-
-        public EndlessScrollListener(int visibleThreshold) {
-            this.visibleThreshold = visibleThreshold;
-        }
-
-        @Override
-        public void onScroll(AbsListView view, int firstVisibleItem,
-                             int visibleItemCount, int totalItemCount) {
-            if (loading) {
-                if (totalItemCount > previousTotal) {
-                    loading = false;
-                    previousTotal = totalItemCount;
-                }
-            }
-            if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
-                // I load the next page of gigs using a background task,
-                // but you can call any function here.
-                if (currentPage < totalPages) {
-                    new getPackRequest().execute();
-                    loading = true;
-                } else {
-                    String str = "There is no more data to display";
-                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-
-        @Override
-        public void onScrollStateChanged(AbsListView view, int scrollState) {
-        }
-    }
-
-    class getPackRequest extends AsyncTask<Void, Void, Boolean> {
-
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progDialog = new ProgressDialog(MainActivity.this);
-            progDialog.setMessage("Loading...");
-            progDialog.setIndeterminate(false);
-            progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progDialog.setCancelable(true);
-            progDialog.show();
-
-        }
+    class loginRequest extends AsyncTask<Void,Void,Boolean>{
 
         @TargetApi(Build.VERSION_CODES.KITKAT)
         @Override
@@ -147,7 +76,7 @@ public class MainActivity extends ActionBarActivity {
 
             Request request = new Request.Builder()
                     .url(getURL())
-                    .get()
+                    .post(body)
                     .addHeader("x-authorization", "e05ebfdadb91ce6937c7341672ef3b72e84b35e3")
                     .build();
 
@@ -163,15 +92,7 @@ public class MainActivity extends ActionBarActivity {
                 jsonObject = new JSONObject(responseString);
                 code = (int) jsonObject.get("result_code");
                 if (code == 100) {
-                    jsonArray = jsonObject.getJSONArray("data");
-                    if (jsonArray != null) {
-                        int len = jsonArray.length();
-                        for (int i = 0; i < len; i++) {
-                            jsonObjectArrayList.add(new JSONObject(String.valueOf(jsonArray.getJSONObject(i))));
-                        }
-                    }
-                } else {
-                    errorMessage = jsonObject.get("error").toString();
+                    jsonObject = (JSONObject) jsonObject.get("api_key");
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -180,15 +101,10 @@ public class MainActivity extends ActionBarActivity {
 
         }
 
-        @Override
         protected void onPostExecute(Boolean aBoolean) {
-            //updateUI();
             if (code == 100) {
-                progDialog.dismiss();
-                updateUI();
+                parseOutData();
             } else {
-                progDialog.dismiss();
-                Toast.makeText(getApplicationContext(), errorMessage, Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -215,120 +131,54 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void updateUI() {
-        if (theAdapter != null) {
-            theAdapter.clear();
-            theListView.setAdapter(theAdapter);
+    public void parseOutData() {
+        try {
+            userID = jsonObject.get("user_id").toString();
+            userApiKey = jsonObject.get("key").toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        startSeeAvailablePacks();
 
-        for (int x = 0; x < jsonObjectArrayList.size(); x++) {
-            JSONObject obj = jsonObjectArrayList.get(x);
-            Iterator<?> keys = obj.keys();
-
-            String listItemText = "";
-
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-
-                try {
-                    if (key.equals("name_short")) {
-                        short_name_list.add(obj.get(key).toString());
-                    }
-                    if (key.equals("team_id")) {
-                        displayedPackIDList.add(obj.get(key).toString());
-                    }
-                    if (key.equals("name")) {
-                        listItemText += obj.get(key).toString() + "\n";
-                    }
-                    if (key.equals("name_short")) {
-                        listItemText += obj.get(key).toString();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            listStrings.add(listItemText);
-        }
-
-        theAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-                listStrings);
-
-        theListView.setAdapter(theAdapter);
-
-        TextView tV = (TextView) findViewById(R.id.instructionTextView);
-        tV.setText("Click on the deck to see all the cards in the deck.");
-
-        theListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                String selectedID = displayedPackIDList.get(i);
-                Intent intent = new Intent(getApplicationContext(), DisplayPlayersInPack.class);
-                intent.putExtra(EXTRA_MESSAGE, selectedID);
-                startActivity(intent);
-            }
-        });
     }
 
-    public void initializeSpinner() {
-        Spinner spinner = (Spinner) findViewById(R.id.city_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.cityArray, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-    }
 
-    public void applyFilter(View view) {
-
-        EditText editText = (EditText) findViewById(R.id.year_edit);
-        year = editText.getText().toString();
-
-        if (!year.isEmpty()) {
-            if (listStrings.size() != 0) {
-                listStrings.clear();
-                jsonObjectArrayList.clear();
-                theAdapter.notifyDataSetChanged();
-            }
-            new getPackRequest().execute();
-
-        } else {
-            Toast.makeText(getApplicationContext(), "Please enter a year.", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public void addListenerToParameterSpinner() {
-        Spinner spinner = (Spinner) findViewById(R.id.city_spinner);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> parent, View arg1, int pos, long arg3) {
-                chosenCityShort = cityMap.get(parent.getItemAtPosition(pos).toString());
-            }
-
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });
-    }
-
-    public void clearData(View view) {
-        listStrings.clear();
-        jsonObjectArrayList.clear();
-        theAdapter.notifyDataSetChanged();
-    }
-
-    public void startSortCards(View view) {
-        Intent intent = new Intent(getApplicationContext(), SortCards.class);
+    public void startSeeAvailablePacks() {
+        Intent intent = new Intent(getApplicationContext(),SeeAvailablePacks.class);
+        String message = email+" "+userID+" "+userApiKey;
+        intent.putExtra(EXTRA_MESSAGE,message);
         startActivity(intent);
     }
 
-    public HttpUrl getURL() {
-        return httpUrl.newBuilder()
-                .setQueryParameter("name_short", chosenCityShort)
-                .setQueryParameter("year", year)
-                .build();
+    public void startLogin(View view) {
+        EditText emailText = (EditText)findViewById(R.id.emailText);
+        email=emailText.getText().toString();
+
+        EditText passwordText = (EditText)findViewById(R.id.passWordText);
+        password=passwordText.getText().toString();
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("email", email);
+        hashMap.put("pass", password);
+        JSONObject tempObject = new JSONObject(hashMap);
+        String jsonString = tempObject.toString();
+
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        body = RequestBody.create(JSON, jsonString);
+
+        new loginRequest().execute();
     }
 
-    public void startSignupActivity(View view)
-    {
+    public void startSignup(View view) {
         Intent intent = new Intent(getApplicationContext(),SignupActivity.class);
         startActivity(intent);
+
     }
+
+    public HttpUrl getURL()
+    {
+        url= HttpUrl.parse("http://chrismobile.strat-o-matic.com/api/v1/users/www/session");
+        return url;
+    }
+
 }

@@ -34,6 +34,14 @@
             android:name=".SignupActivity"
             android:label="SignupActivity" >
         </activity>
+        <activity
+            android:name=".SearchPacksActivity"
+            android:label="@string/title_activity_search_packs" >
+        </activity>
+        <activity
+            android:name=".SeeAvailablePacks"
+            android:label="@string/title_activity_see_available_packs" >
+        </activity>
     </application>
 
 </manifest>

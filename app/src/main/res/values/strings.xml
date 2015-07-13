@@ -12,7 +12,7 @@
                                         about them.</string>
     <string name="title_activity_display_player_stats">DisplayPlayerStats</string>
     <string name="stat_info_string">These are the stats about that player.</string>
-    <string name="search_instructions_string">Search for packs with a certain parameter...</string>
+    <string name="search_instructions_string">Search for packs that you don\'t own by city and year.</string>
     <string name="card_sort_button_text">Sort cards instead</string>
     <string name="title_activity_sort_cards">SortCards</string>
     <string name="card_search_instruction_string">Sort cards based on their numerical stats</string>
@@ -24,4 +24,7 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="login_text">Login</string>
     <string name="signup_button_text">Sign up</string>
+    <string name="title_activity_login_screen">LoginScreen</string>
+    <string name="title_activity_search_packs">SearchPacksActivity</string>
+    <string name="title_activity_see_available_packs">SeeAvailablePacks</string>
 </resources>
