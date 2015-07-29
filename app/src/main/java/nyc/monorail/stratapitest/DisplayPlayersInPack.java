@@ -5,10 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
+import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,11 +23,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 
 public class DisplayPlayersInPack extends ActionBarActivity {
@@ -37,7 +33,9 @@ public class DisplayPlayersInPack extends ActionBarActivity {
     HttpUrl url;
     JSONObject jsonObject;
     JSONArray jsonArray;
-    String teamID;
+    String packID;
+    String userApiKey;
+    String userID;
     ArrayList<JSONObject> jsonObjectArrayList;
     JSONObject paginationObject;
     int currentPage = 1;
@@ -46,9 +44,15 @@ public class DisplayPlayersInPack extends ActionBarActivity {
     ArrayList<String> listStrings;
     ListView theListView;
     ArrayList<String> firstNameArrayList;
+    ArrayList<String> playerIdList;
+    ArrayList<Card> cardList;
     ProgressDialog progDialog;
     String baseURLString;
+    User user;
+    Pack pack;
     static final String EXTRA_MESSAGE = "nyc.monorail.stratapitest.MESSAGE";
+    static final String EXTRA_PACK = "nyc.monorail.stratapitest.PACK";
+    static final String EXTRA_CARD = "nyc.monorail.stratapitest.CARD";
 
 
     @Override
@@ -56,13 +60,19 @@ public class DisplayPlayersInPack extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_players_in_pack);
         Intent intent = getIntent();
-        teamID = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+        pack = (Pack) intent.getParcelableExtra(EXTRA_PACK);
+        user = (User) intent.getParcelableExtra(EXTRA_MESSAGE);
+        userApiKey = user.getUserApiKey();
+        userID = user.getUserID();
+        packID = pack.getPackID();
         jsonObjectArrayList = new ArrayList<>();
+        cardList = new ArrayList<>();
         theListView = (ListView) findViewById(R.id.listView);
         listStrings = new ArrayList<>();
         firstNameArrayList = new ArrayList<>();
+        playerIdList = new ArrayList<>();
 
-        baseURLString = "http://chrismobile.strat-o-matic.com/api/v1/cards";
+        baseURLString = BaseUrl.getBase() + "/api/v1/user_cards/";
         new getCardsInPack().execute();
 
 
@@ -89,7 +99,7 @@ public class DisplayPlayersInPack extends ActionBarActivity {
             Request request = new Request.Builder()
                     .url(getURL())
                     .get()
-                    .addHeader("x-authorization", "e05ebfdadb91ce6937c7341672ef3b72e84b35e3")
+                    .addHeader("x-authorization", userApiKey)
                     .build();
 
             Response response = null;
@@ -102,7 +112,6 @@ public class DisplayPlayersInPack extends ActionBarActivity {
             }
             try {
                 jsonObject = new JSONObject(responseString);
-
                 jsonArray = jsonObject.getJSONArray("data");
                 if (jsonArray != null) {
                     int len = jsonArray.length();
@@ -128,6 +137,7 @@ public class DisplayPlayersInPack extends ActionBarActivity {
                 currentPage++;
                 new getCardsInPack().execute();
             } else {
+
                 updateUI();
             }
         }
@@ -152,17 +162,31 @@ public class DisplayPlayersInPack extends ActionBarActivity {
     public void updateUI() {
 
         for (int x = 0; x < jsonObjectArrayList.size(); x++) {
-            JSONObject obj = jsonObjectArrayList.get(x);
-
             String listItemText = "";
+            HashMap<String, String> propMap = new HashMap<>();
 
             try {
-                listItemText += obj.get("first_name").toString() + " " + obj.get("last_name");
-                firstNameArrayList.add(obj.get("first_name").toString());
+                JSONObject obj = new JSONObject(jsonObjectArrayList.get(x).get("card").toString());
+                if (obj != null) {
+                    listItemText += obj.get("first_name").toString() + " " + obj.get("last_name");
+                    firstNameArrayList.add(obj.get("first_name").toString());
+                    playerIdList.add(obj.get("card_id").toString());
+                    listStrings.add(listItemText);
+
+                    Iterator<?> keys = obj.keys();
+
+                    while (keys.hasNext()) {
+                        String key = (String) keys.next();
+                        propMap.put(key, obj.get(key).toString());
+                    }
+                }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            listStrings.add(listItemText);
+
+            cardList.add(new Card(propMap));
+
         }
 
 
@@ -173,18 +197,19 @@ public class DisplayPlayersInPack extends ActionBarActivity {
         theListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String dataToSend = firstNameArrayList.get(i) + " " + teamID;
                 Intent intent = new Intent(getApplicationContext(), DisplayPlayerStats.class);
-                intent.putExtra(EXTRA_MESSAGE, dataToSend);
+                intent.putExtra(EXTRA_MESSAGE, user);
+                intent.putExtra(EXTRA_CARD, cardList.get(i));
                 startActivity(intent);
             }
         });
     }
 
     public HttpUrl getURL() {
-        url = HttpUrl.parse(baseURLString);
+        url = HttpUrl.parse(baseURLString + userID);
         return url.newBuilder()
-                .addQueryParameter("mlb_team_id", teamID)
+                .addQueryParameter("pack_id", packID)
+                .addQueryParameter("format", "extended")
                 .addQueryParameter("page", String.valueOf(currentPage))
                 .build();
     }

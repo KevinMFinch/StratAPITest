@@ -32,14 +32,14 @@
         android:inputType="textPassword"/>
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="230dp"
         android:layout_height="wrap_content"
         android:text="Login"
         android:onClick="startLogin"
         android:layout_gravity="center_horizontal"/>
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="230dp"
         android:layout_height="wrap_content"
         android:text="New user? Click here."
         android:layout_gravity="center_horizontal"

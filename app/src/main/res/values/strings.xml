@@ -27,4 +27,9 @@
     <string name="title_activity_login_screen">LoginScreen</string>
     <string name="title_activity_search_packs">SearchPacksActivity</string>
     <string name="title_activity_see_available_packs">SeeAvailablePacks</string>
+    <string name="title_activity_lists">ListsActivity</string>
+    <string name="title_activity_display_cards_in_list">DisplayCardsInList</string>
+    <string name="title_activity_assign_buddy">AssignBuddy</string>
+    <string name="title_activity_display_profile">DisplayProfile</string>
+    <string name="title_activity_account">AccountActivity</string>
 </resources>

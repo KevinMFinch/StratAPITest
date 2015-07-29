@@ -1,24 +1,15 @@
 package nyc.monorail.stratapitest;
 
 import android.annotation.TargetApi;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;
@@ -32,15 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -48,13 +32,16 @@ public class MainActivity extends ActionBarActivity {
     String email;
     String password;
     String errorMessage;
+    User user;
     String userID;
     String userApiKey;
+    String credits;
     HttpUrl url;
     JSONArray jsonArray;
     JSONObject jsonObject;
+    JSONObject creditObject;
     int code;
-    RequestBody body ;
+    RequestBody body;
     ArrayList<JSONObject> jsonObjectArrayList;
 
     static final String EXTRA_MESSAGE = "nyc.monorail.stratapitest.MESSAGE";
@@ -67,7 +54,7 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    class loginRequest extends AsyncTask<Void,Void,Boolean>{
+    class loginRequest extends AsyncTask<Void, Void, Boolean> {
 
         @TargetApi(Build.VERSION_CODES.KITKAT)
         @Override
@@ -92,7 +79,9 @@ public class MainActivity extends ActionBarActivity {
                 jsonObject = new JSONObject(responseString);
                 code = (int) jsonObject.get("result_code");
                 if (code == 100) {
+                    creditObject = (JSONObject) jsonObject.get("credits");
                     jsonObject = (JSONObject) jsonObject.get("api_key");
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -135,6 +124,7 @@ public class MainActivity extends ActionBarActivity {
         try {
             userID = jsonObject.get("user_id").toString();
             userApiKey = jsonObject.get("key").toString();
+            credits = creditObject.get("current_total_unused_credits").toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -144,18 +134,18 @@ public class MainActivity extends ActionBarActivity {
 
 
     public void startSeeAvailablePacks() {
-        Intent intent = new Intent(getApplicationContext(),SeeAvailablePacks.class);
-        String message = email+" "+userID+" "+userApiKey;
-        intent.putExtra(EXTRA_MESSAGE,message);
+        Intent intent = new Intent(getApplicationContext(), SeeAvailablePacks.class);
+        user = new User(userID, userApiKey, credits);
+        intent.putExtra(EXTRA_MESSAGE, user);
         startActivity(intent);
     }
 
     public void startLogin(View view) {
-        EditText emailText = (EditText)findViewById(R.id.emailText);
-        email=emailText.getText().toString();
+        EditText emailText = (EditText) findViewById(R.id.emailText);
+        email = emailText.getText().toString();
 
-        EditText passwordText = (EditText)findViewById(R.id.passWordText);
-        password=passwordText.getText().toString();
+        EditText passwordText = (EditText) findViewById(R.id.passWordText);
+        password = passwordText.getText().toString();
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("email", email);
@@ -170,15 +160,13 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void startSignup(View view) {
-        Intent intent = new Intent(getApplicationContext(),SignupActivity.class);
+        Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
         startActivity(intent);
 
     }
 
-    public HttpUrl getURL()
-    {
-        url= HttpUrl.parse("http://chrismobile.strat-o-matic.com/api/v1/users/www/session");
-        return url;
+    public HttpUrl getURL() {
+        return HttpUrl.parse(BaseUrl.getBase() + "/api/v1/users/www/session");
     }
 
 }

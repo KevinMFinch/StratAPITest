@@ -1,13 +1,11 @@
 package nyc.monorail.stratapitest;
 
 import android.annotation.TargetApi;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,8 +24,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -47,14 +43,14 @@ public class SignupActivity extends ActionBarActivity {
     String email, password;
     String userID;
     String userApiKey;
-    static final String EXTRA_MESSAGE= "nyc.monorail.stratapitest.MESSAGE";
+    static final String EXTRA_MESSAGE = "nyc.monorail.stratapitest.MESSAGE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         jsonObjectArrayList = new ArrayList<>();
-        baseURLString = "http://chrismobile.strat-o-matic.com/api/v1/users/www";
+        baseURLString = BaseUrl.getBase() + "/api/v1/users/www";
     }
 
     @Override
@@ -90,7 +86,7 @@ public class SignupActivity extends ActionBarActivity {
                     .url(getURL())
                     .post(body)
                     .addHeader("x-authorization", "e05ebfdadb91ce6937c7341672ef3b72e84b35e3")
-                    .addHeader("Content-Type","form-data")
+                    .addHeader("Content-Type", "form-data")
                     .build();
 
             Response response = null;
@@ -131,11 +127,10 @@ public class SignupActivity extends ActionBarActivity {
         }
     }
 
-    public void startSeeAvailablePacks()
-    {
-        Intent intent = new Intent(getApplicationContext(),SeeAvailablePacks.class);
-        String message = email+" "+userID+" "+userApiKey;
-        intent.putExtra(EXTRA_MESSAGE,message);
+    public void startSeeAvailablePacks() {
+        Intent intent = new Intent(getApplicationContext(), SeeAvailablePacks.class);
+        String message = email + " " + userID + " " + userApiKey;
+        intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
     }
 

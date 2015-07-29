@@ -3,6 +3,7 @@
     package="nyc.monorail.stratapitest" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.android.vending.BILLING" />
 
     <application
         android:allowBackup="true"
@@ -40,7 +41,22 @@
         </activity>
         <activity
             android:name=".SeeAvailablePacks"
-            android:label="@string/title_activity_see_available_packs" >
+            android:label="@string/title_activity_see_available_packs" ></activity>
+        <activity
+            android:name=".ListsActivity"
+            android:label="@string/title_activity_lists"></activity>
+        <activity
+            android:name=".DisplayCardsInList"
+            android:label="@string/title_activity_display_cards_in_list"></activity>
+        <activity
+            android:name=".AssignBuddy"
+            android:label="@string/title_activity_assign_buddy"></activity>
+        <activity
+            android:name=".DisplayProfile"
+            android:label="@string/title_activity_display_profile"></activity>
+        <activity
+            android:name=".AccountActivity"
+            android:label="@string/title_activity_account">
         </activity>
     </application>
 

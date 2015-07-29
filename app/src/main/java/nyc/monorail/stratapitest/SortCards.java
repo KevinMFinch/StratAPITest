@@ -1,7 +1,6 @@
 package nyc.monorail.stratapitest;
 
 import android.annotation.TargetApi;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -68,7 +67,7 @@ public class SortCards extends ActionBarActivity {
         displayedNameList = new ArrayList<>();
         initializeSortSpinner();
         addListenerToSortSpinner();
-        baseURLString = "http://chrismobile.strat-o-matic.com/api/v1/cards";
+        baseURLString = BaseUrl.getBase() + "/api/v1/cards";
 
         equalityTesters = new ArrayList<>();
         equalityTesters.add(">");
