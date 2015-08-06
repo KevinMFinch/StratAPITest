@@ -257,23 +257,25 @@ public class SortCards extends ActionBarActivity {
 
         parameter = str;
 
-        if (listStrings.size() == 0) {
-            if (itemSelectedInSortSpinner.equals("No Sort")) {
-                isSorting = false;
-            } else {
-                isSorting = true;
-                sortString = "";
-                if (itemSelectedInSortSpinner.equals("Ascending")) {
-                    sortString = parameter + " asc";
-                } else {
-                    sortString = parameter + " dsc";
-                }
-            }
-            new getCardRequest().execute();
-
-        } else {
-            Toast.makeText(getApplicationContext(), "Make sure to clear your data first!", Toast.LENGTH_SHORT).show();
+        if(listStrings.size() != 0)
+        {
+            clearList();
         }
+
+        if (itemSelectedInSortSpinner.equals("No Sort")) {
+            isSorting = false;
+        } else {
+            isSorting = true;
+            sortString = "";
+            if (itemSelectedInSortSpinner.equals("Ascending")) {
+                sortString = parameter + " asc";
+            } else {
+                sortString = parameter + " dsc";
+            }
+        }
+        new getCardRequest().execute();
+
+
     }
 
     public void initializeParameterSpinner() {
@@ -335,12 +337,7 @@ public class SortCards extends ActionBarActivity {
         });
     }
 
-    public void startSortPacks(View view) {
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(intent);
-    }
-
-    public void clearList(View view) {
+    public void clearList() {
         displayedPackIDList.clear();
         currentPage = 1;
         jsonObjectArrayList.clear();

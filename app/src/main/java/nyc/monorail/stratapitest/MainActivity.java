@@ -1,6 +1,7 @@
 package nyc.monorail.stratapitest;
 
 import android.annotation.TargetApi;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -43,6 +44,7 @@ public class MainActivity extends ActionBarActivity {
     int code;
     RequestBody body;
     ArrayList<JSONObject> jsonObjectArrayList;
+    ProgressDialog progDialog;
 
     static final String EXTRA_MESSAGE = "nyc.monorail.stratapitest.MESSAGE";
 
@@ -52,9 +54,16 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         jsonObjectArrayList = new ArrayList<>();
 
+
+
     }
 
     class loginRequest extends AsyncTask<Void, Void, Boolean> {
+
+        protected void onPreExecute()
+        {
+            progDialog = ProgressDialog.show(MainActivity.this, "Please wait ...", "Signing in...", true);
+        }
 
         @TargetApi(Build.VERSION_CODES.KITKAT)
         @Override
@@ -91,6 +100,7 @@ public class MainActivity extends ActionBarActivity {
         }
 
         protected void onPostExecute(Boolean aBoolean) {
+            progDialog.dismiss();
             if (code == 100) {
                 parseOutData();
             } else {
@@ -168,5 +178,6 @@ public class MainActivity extends ActionBarActivity {
     public HttpUrl getURL() {
         return HttpUrl.parse(BaseUrl.getBase() + "/api/v1/users/www/session");
     }
+
 
 }
